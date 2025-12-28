@@ -76,6 +76,22 @@ I -.-> E
 - AI-ready analytics foundation
 ---
 
+## Execution Flow
+
+1. **Bronze Ingestion**
+   - Source: `data/sample/customer_events.json`
+   - Notebook: `notebooks/bronze/bronze_ingestion_example.py`
+   - Output: Delta tables in Bronze layer
+
+2. **Silver Transformation**
+   - Notebook: `notebooks/silver/silver_transformation_example.py`
+   - Actions: cleansing, deduplication, schema enforcement
+   - Output: governed Silver Delta tables
+
+3. **Gold Aggregation**
+   - Notebook: `notebooks/gold/gold_aggregation_example.py`
+   - Actions: business aggregations and analytics-ready views
+   - Output: curated Gold datasets for BI and ML
 ## Key Components
 
 ### Data Ingestion
