@@ -1,4 +1,12 @@
 """
+NOTE:
+This notebook assumes sample data from:
+data/sample/customer_events.ndjson
+
+In Databricks, upload this file to DBFS:
+dbfs:/mnt/data/sample/customer_events.ndjson
+"""
+"""
 bronze_ingestion_example.py
 Illustrative example: JSON ingestion -> Bronze Delta (raw, immutable-style)
 
