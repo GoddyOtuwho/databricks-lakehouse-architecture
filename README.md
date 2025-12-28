@@ -10,31 +10,61 @@ banking and enterprise data platform standards.
 
 ---
 
+## Architecture Diagram
+
+```mermaid
 flowchart LR
-    A[Enterprise Data Sources<br/>• Operational Databases<br/>• SaaS Applications<br/>• Logs & Events] --> B[Secure Data Ingestion Layer<br/>• Batch & Streaming<br/>• Schema Validation<br/>• Data Quality Checks]
+    A["Enterprise Data Sources
+    - Operational Databases
+    - SaaS Applications
+    - Logs and Events"] --> 
+    B["Secure Data Ingestion Layer
+    - Batch and Streaming
+    - Schema Validation
+    - Data Quality Checks"]
 
-    B --> C[Bronze Layer<br/>Raw Data Storage<br/>• Immutable<br/>• Encrypted at Rest<br/>• Audit-Ready]
+    B --> C["Bronze Layer
+    Raw Data Storage
+    - Immutable
+    - Encrypted at Rest
+    - Audit Ready"]
 
-    subgraph Secure_Analytics_Boundary [Secure Analytics Boundary]
-        C --> D[Silver Layer<br/>Cleansed & Validated Data<br/>• Deduplication<br/>• Standardization]
+    subgraph SAB["Secure Analytics Boundary"]
+        C --> D["Silver Layer
+        Cleansed and Validated Data
+        - Deduplication
+        - Standardization"]
 
-        D --> E[Gold Layer<br/>Curated & Analytics-Ready Data<br/>• Business Aggregations<br/>• Optimized Schemas]
+        D --> E["Gold Layer
+        Curated Analytics Ready Data
+        - Business Aggregations
+        - Optimized Schemas"]
 
-        subgraph Databricks [Azure Databricks Workspace]
+        subgraph DBX["Azure Databricks Workspace"]
             D
             E
         end
     end
 
-    E --> F[Analytics & Consumption Layer<br/>• SQL Analytics<br/>• BI & Reporting<br/>• Data Science & ML]
+    E --> F["Analytics and Consumption Layer
+    - SQL Analytics
+    - BI Reporting
+    - Data Science and ML"]
 
-    E --> G[AI & Advanced Analytics Workloads<br/>• Feature Engineering<br/>• Model Training]
+    E --> G["AI and Advanced Analytics Workloads
+    - Feature Engineering
+    - Model Training"]
 
-    H[Data Governance & Access Control<br/>• RBAC<br/>• Least Privilege<br/>• Auditing] -.-> D
+    H["Data Governance and Access Control
+    - RBAC
+    - Least Privilege
+    - Auditing"] -.-> D
     H -.-> E
 
-    I[Monitoring & Observability<br/>• Logging<br/>• Telemetry<br/>• Compliance Visibility] -.-> Databricks
-
+    I["Monitoring and Observability
+    - Logging
+    - Telemetry
+    - Compliance Visibility"] -.-> DBX
     ---
 
 ## Architecture Highlights
