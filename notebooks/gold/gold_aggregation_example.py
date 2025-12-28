@@ -1,14 +1,15 @@
 """
-Gold Aggregation Example (Silver -> Gold)
------------------------------------------
+gold_aggregation_example.py
+Illustrative example: Silver -> Gold aggregation
+
 Purpose:
 - Produce analytics-ready datasets (Gold)
-- Apply business aggregations and metrics
+- Apply business aggregations/metrics
 - Serve BI tools and downstream analytics workloads
 
 Notes:
-- This is a reference implementation
-- Replace paths/catalog/schema with your enterprise conventions
+- Intentionally minimal (reference design).
+- Replace paths/catalog/schema to match your environment.
 """
 
 from pyspark.sql import functions as F
@@ -18,7 +19,7 @@ from pyspark.sql import functions as F
 # -----------------------------
 SILVER_PATH = "/mnt/silver/customer_events"
 GOLD_PATH = "/mnt/gold/customer_event_metrics"
-GOLD_TABLE_NAME = "gold.customer_event_metrics"  # optional UC table name
+GOLD_TABLE = "gold.customer_event_metrics"  # optional
 
 # -----------------------------
 # 2) Read Silver Delta
@@ -26,9 +27,9 @@ GOLD_TABLE_NAME = "gold.customer_event_metrics"  # optional UC table name
 df_silver = spark.read.format("delta").load(SILVER_PATH)
 
 # -----------------------------
-# 3) Example Business Aggregations
-# -----------------------------
+# 3) Example business aggregations
 # Daily metrics per customer
+# -----------------------------
 df_gold = (
     df_silver
     .withColumn("event_date", F.to_date(F.col("event_time")))
@@ -36,16 +37,15 @@ df_gold = (
     .agg(
         F.count("*").alias("event_count"),
         F.countDistinct("event_type").alias("distinct_event_types"),
-        F.sum(F.coalesce(F.col("amount"), F.lit(0.0))).alias("total_amount"),
-        F.max("event_time").alias("last_event_time")
+        F.sum(F.col("amount")).alias("total_amount"),
+        F.max("event_time").alias("last_event_time"),
     )
     .withColumn("as_of_time", F.current_timestamp())
 )
 
 # -----------------------------
-# 4) Write Gold Delta (Overwrite)
+# 4) Write Gold Delta
 # -----------------------------
-# Gold tables are often rebuilt on schedule (e.g., daily)
 (
     df_gold.write
     .format("delta")
@@ -55,8 +55,8 @@ df_gold = (
     .save(GOLD_PATH)
 )
 
-# Optional: Register table in catalog
-# spark.sql(f"CREATE TABLE IF NOT EXISTS {GOLD_TABLE_NAME} USING DELTA LOCATION '{GOLD_PATH}'")
+# Optional: register table
+# spark.sql(f"CREATE TABLE IF NOT EXISTS {GOLD_TABLE} USING DELTA LOCATION '{GOLD_PATH}'")
 
 print("✅ Gold aggregation complete.")
 print(f"Gold path: {GOLD_PATH}")
