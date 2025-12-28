@@ -3,60 +3,70 @@ gold_aggregation_example.py
 Illustrative example: Silver -> Gold aggregation
 
 Purpose:
-- Produce analytics-ready datasets (Gold)
-- Apply business aggregations/metrics
-- Serve BI tools and downstream analytics workloads
+- Create analytics-ready Gold datasets
+- Apply business-level aggregations
+- Optimize for BI / ML consumption
 
 Notes:
-- Intentionally minimal (reference design).
-- Replace paths/catalog/schema to match your environment.
+- Intentionally minimal (reference design)
+- Replace catalog/schema as needed
 """
 
 from pyspark.sql import functions as F
 
 # -----------------------------
-# 1) Parameters
+# Parameters
 # -----------------------------
+USE_TABLES = True
+
 SILVER_PATH = "/mnt/silver/customer_events"
-GOLD_PATH = "/mnt/gold/customer_event_metrics"
-GOLD_TABLE = "gold.customer_event_metrics"  # optional
+GOLD_PATH = "/mnt/gold/customer_metrics"
+
+SILVER_TABLE = "silver.customer_events_clean"
+GOLD_TABLE = "gold.customer_metrics"
 
 # -----------------------------
-# 2) Read Silver Delta
+# Read Silver
 # -----------------------------
-df_silver = spark.read.format("delta").load(SILVER_PATH)
+if USE_TABLES:
+    df_silver = spark.table(SILVER_TABLE)
+else:
+    df_silver = spark.read.format("delta").load(SILVER_PATH)
 
 # -----------------------------
-# 3) Example business aggregations
-# Daily metrics per customer
+# Business Aggregations
 # -----------------------------
 df_gold = (
     df_silver
-    .withColumn("event_date", F.to_date(F.col("event_time")))
-    .groupBy("customer_id", "event_date")
+    .groupBy("customer_id")
     .agg(
-        F.count("*").alias("event_count"),
-        F.countDistinct("event_type").alias("distinct_event_types"),
-        F.sum(F.col("amount")).alias("total_amount"),
-        F.max("event_time").alias("last_event_time"),
+        F.count("*").alias("total_events"),
+        F.sum(
+            F.when(F.col("event_type") == "PURCHASE", F.col("amount")).otherwise(0.0)
+        ).alias("total_purchase_amount"),
+        F.max("event_time").alias("last_event_time")
     )
-    .withColumn("as_of_time", F.current_timestamp())
 )
 
 # -----------------------------
-# 4) Write Gold Delta
+# Write Gold
 # -----------------------------
 (
-    df_gold.write
+    df_gold
+    .write
     .format("delta")
     .mode("overwrite")
     .option("overwriteSchema", "true")
-    .partitionBy("event_date")
     .save(GOLD_PATH)
 )
 
 # Optional: register table
-# spark.sql(f"CREATE TABLE IF NOT EXISTS {GOLD_TABLE} USING DELTA LOCATION '{GOLD_PATH}'")
+if USE_TABLES:
+    spark.sql(f"CREATE DATABASE IF NOT EXISTS {GOLD_TABLE.split('.')[0]}")
+    spark.sql(f"DROP TABLE IF EXISTS {GOLD_TABLE}")
+    spark.sql(f"CREATE TABLE {GOLD_TABLE} USING DELTA LOCATION '{GOLD_PATH}'")
 
-print("✅ Gold aggregation complete.")
+print("✅ Gold aggregation complete")
 print(f"Gold path: {GOLD_PATH}")
+if USE_TABLES:
+    print(f"Gold table: {GOLD_TABLE}")
