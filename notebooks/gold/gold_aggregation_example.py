@@ -1,55 +1,62 @@
 """
-gold_aggregation_example.py
-Illustrative example: Silver -> Gold aggregation in a Databricks Lakehouse.
-
+Gold Aggregation Example (Silver -> Gold)
+-----------------------------------------
 Purpose:
-- Produce curated, analytics-ready datasets (Gold layer)
-- Model business-facing aggregates for BI and reporting use cases
+- Produce analytics-ready datasets (Gold)
+- Apply business aggregations and metrics
+- Serve BI tools and downstream analytics workloads
 
 Notes:
-- Reference implementation (intentionally minimal)
-- Replace paths/catalog/schema with your environment conventions
+- This is a reference implementation
+- Replace paths/catalog/schema with your enterprise conventions
 """
 
 from pyspark.sql import functions as F
 
 # -----------------------------
-# Inputs (Silver)
+# 1) Parameters
 # -----------------------------
-silver_path = "/mnt/silver/customer_events"  # example path
-df_silver = spark.read.format("delta").load(silver_path)
+SILVER_PATH = "/mnt/silver/customer_events"
+GOLD_PATH = "/mnt/gold/customer_event_metrics"
+GOLD_TABLE_NAME = "gold.customer_event_metrics"  # optional UC table name
 
 # -----------------------------
-# Business Aggregations
-# Example: Daily metrics by event type
+# 2) Read Silver Delta
 # -----------------------------
+df_silver = spark.read.format("delta").load(SILVER_PATH)
+
+# -----------------------------
+# 3) Example Business Aggregations
+# -----------------------------
+# Daily metrics per customer
 df_gold = (
     df_silver
-    .withColumn("event_date", F.to_date("event_time"))
-    .groupBy("event_date", "event_type")
+    .withColumn("event_date", F.to_date(F.col("event_time")))
+    .groupBy("customer_id", "event_date")
     .agg(
         F.count("*").alias("event_count"),
-        F.countDistinct("customer_id").alias("unique_customers")
+        F.countDistinct("event_type").alias("distinct_event_types"),
+        F.sum(F.coalesce(F.col("amount"), F.lit(0.0))).alias("total_amount"),
+        F.max("event_time").alias("last_event_time")
     )
-    .orderBy(F.col("event_date").desc())
+    .withColumn("as_of_time", F.current_timestamp())
 )
 
 # -----------------------------
-# Output (Gold)
+# 4) Write Gold Delta (Overwrite)
 # -----------------------------
-gold_path = "/mnt/gold/daily_event_metrics"  # example path
+# Gold tables are often rebuilt on schedule (e.g., daily)
 (
-    df_gold
-    .write
+    df_gold.write
     .format("delta")
     .mode("overwrite")
     .option("overwriteSchema", "true")
-    .save(gold_path)
+    .partitionBy("event_date")
+    .save(GOLD_PATH)
 )
 
-# Optional: Register table (Unity Catalog style)
-# spark.sql("CREATE SCHEMA IF NOT EXISTS main.gold")
-# spark.sql(
-#     f"CREATE TABLE IF NOT EXISTS main.gold.daily_event_metrics "
-#     f"USING DELTA LOCATION '{gold_path}'"
-# )
+# Optional: Register table in catalog
+# spark.sql(f"CREATE TABLE IF NOT EXISTS {GOLD_TABLE_NAME} USING DELTA LOCATION '{GOLD_PATH}'")
+
+print("✅ Gold aggregation complete.")
+print(f"Gold path: {GOLD_PATH}")
