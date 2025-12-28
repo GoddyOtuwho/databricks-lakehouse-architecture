@@ -1,5 +1,6 @@
 # Secure Lakehouse Architecture – Azure Databricks
-
+> This repository is a reference architecture and design artifact.  
+> Implementation notebooks are intentionally minimal and illustrative.
 ## Overview
 This repository demonstrates a **secure, enterprise-grade Lakehouse reference architecture**
 built on **Azure Databricks and Delta Lake**, designed to support **analytics and AI-ready workloads**
