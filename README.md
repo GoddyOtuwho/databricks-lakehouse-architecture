@@ -10,7 +10,8 @@ banking and enterprise data platform standards.
 
 ---
 ## Architecture Diagram
-````mermaid
+
+```mermaid
 flowchart LR
     A["Enterprise Data Sources
     - Operational Databases
@@ -64,14 +65,16 @@ flowchart LR
     - Telemetry
     - Compliance Visibility"] -.-> DBX
     ---
+```markdown
+---
+
 ## Architecture Highlights
 
 - Secure data ingestion from multiple sources
 - Medallion architecture (Bronze, Silver, Gold)
 - Role-based access control and data governance
 - Separation of compute, storage, and security boundaries
-- AI-ready analytics foundation
-
+- AI-ready analytics foundatio
 ---
 
 ## Key Components
