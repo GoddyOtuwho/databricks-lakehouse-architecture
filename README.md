@@ -9,10 +9,8 @@ The architecture emphasizes **security-by-design, governance, and scalability**,
 banking and enterprise data platform standards.
 
 ---
-
 ## Architecture Diagram
-
-```mermaid
+````mermaid
 flowchart LR
     A["Enterprise Data Sources
     - Operational Databases
@@ -66,7 +64,6 @@ flowchart LR
     - Telemetry
     - Compliance Visibility"] -.-> DBX
     ---
-
 ## Architecture Highlights
 
 - Secure data ingestion from multiple sources
