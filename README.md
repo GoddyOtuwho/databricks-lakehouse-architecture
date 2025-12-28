@@ -72,7 +72,7 @@ I -.-> E
 - Medallion architecture (Bronze, Silver, Gold)
 - Role-based access control and data governance
 - Separation of compute, storage, and security boundaries
-- AI-ready analytics foundatio
+- AI-ready analytics foundation
 ---
 
 ## Key Components
