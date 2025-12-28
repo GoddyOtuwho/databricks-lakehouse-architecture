@@ -9,78 +9,63 @@ The architecture emphasizes **security-by-design, governance, and scalability**,
 banking and enterprise data platform standards.
 
 ---
-## Architecture Diagram
-
 ```mermaid
 flowchart LR
-    A["Enterprise Data Sources
-    - Operational Databases
-    - SaaS Applications
-    - Logs and Events"]
+A["Enterprise Data Sources
+- Operational Databases
+- SaaS Applications
+- Logs and Events"]
 
-    B["Secure Data Ingestion Layer
-    - Batch and Streaming
-    - Schema Validation
-    - Data Quality Checks"]
+B["Secure Data Ingestion Layer
+- Batch and Streaming
+- Schema Validation
+- Data Quality Checks"]
 
-    C["Bronze Layer
-    Raw Data Storage
-    - Immutable
-    - Encrypted at Rest
-    - Audit Ready"]
+C["Bronze Layer
+Raw Data Storage
+- Immutable
+- Encrypted at Rest
+- Audit Ready"]
 
-    D["Silver Layer
-    Cleansed and Validated Data
-    - Deduplication
-    - Standardization"]
+D["Silver Layer
+Cleansed and Validated Data
+- Deduplication
+- Standardization"]
 
-    E["Gold Layer
-    Curated Analytics Ready Data
-    - Business Aggregations
-    - Optimized Schemas"]
+E["Gold Layer
+Curated Analytics Ready Data
+- Business Aggregations
+- Optimized Schemas"]
 
-    F["Analytics and Consumption Layer
-    - SQL Analytics
-    - BI Reporting
-    - Data Science and ML"]
+F["Analytics and Consumption Layer
+- SQL Analytics
+- BI Reporting
+- Data Science and ML"]
 
-    G["AI and Advanced Analytics Workloads
-    - Feature Engineering
-    - Model Training"]
+G["AI and Advanced Analytics Workloads
+- Feature Engineering
+- Model Training"]
 
-    H["Data Governance and Access Control
-    - RBAC
-    - Least Privilege
-    - Auditing"]
+H["Data Governance and Access Control
+- RBAC
+- Least Privilege
+- Auditing"]
 
-    I["Monitoring and Observability
-    - Logging
-    - Telemetry
-    - Compliance Visibility"]
+I["Monitoring and Observability
+- Logging
+- Telemetry
+- Compliance Visibility"]
 
-    A --> B
-    B --> C
-
-    subgraph SAB["Secure Analytics Boundary"]
-        C --> D
-        D --> E
-
-        subgraph DBX["Azure Databricks Workspace"]
-            D
-            E
-        end
-    end
-
-    E --> F
-    E --> G
-
-    H -.-> D
-    H -.-> E
-    I -.-> DBX
-    ---
-```markdown
----
-
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+E --> G
+H -.-> D
+H -.-> E
+I -.-> E
+```
 ## Architecture Highlights
 
 - Secure data ingestion from multiple sources
