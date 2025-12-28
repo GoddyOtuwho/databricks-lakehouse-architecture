@@ -76,6 +76,14 @@ I -.-> E
 - AI-ready analytics foundation
 ---
 
+## Design Decisions
+
+- Medallion architecture (Bronze, Silver, Gold) chosen to isolate raw, cleansed, and curated data concerns.
+- Delta Lake selected for ACID transactions, schema enforcement, and auditability via transaction logs.
+- Security-by-design applied through encryption at rest and in transit, RBAC, and least-privilege access.
+- Unity Catalog assumed for centralized metadata management, governance, and data lineage.
+- Compute and storage intentionally decoupled to support scalable, cost-efficient analytics.
+- Notebooks are intentionally minimal and illustrative to emphasize architectural intent over production hardening.
 ## Execution Flow
 
 1. **Bronze Ingestion**
