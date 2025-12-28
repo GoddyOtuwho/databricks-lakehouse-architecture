@@ -1,0 +1,6 @@
+{"event_id":"e1","customer_id":"c101","event_type":"login","event_time":"2025-12-01T09:01:00Z","amount":0.0,"source_system":"web"}
+{"event_id":"e2","customer_id":"c101","event_type":"purchase","event_time":"2025-12-01T09:10:00Z","amount":29.99,"source_system":"web"}
+{"event_id":"e3","customer_id":"c202","event_type":"login","event_time":"2025-12-01T11:05:00Z","amount":0.0,"source_system":"mobile"}
+{"event_id":"e4","customer_id":"c202","event_type":"purchase","event_time":"2025-12-02T14:22:00Z","amount":120.0,"source_system":"mobile"}
+{"event_id":"e4","customer_id":"c202","event_type":"purchase","event_time":"2025-12-02T14:22:00Z","amount":120.0,"source_system":"mobile"}
+{"event_id":"e5","customer_id":null,"event_type":"login","event_time":"2025-12-03T08:00:00Z","amount":0.0,"source_system":"web"}
