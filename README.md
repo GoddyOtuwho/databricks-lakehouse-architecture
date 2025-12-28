@@ -1,108 +1,84 @@
 # Secure Lakehouse Architecture – Azure Databricks
 
-Reference Architecture & Demo Repository
+## Overview
+This repository demonstrates a **secure, enterprise-grade Lakehouse reference architecture**
+built on **Azure Databricks and Delta Lake**, designed to support **analytics and AI-ready workloads**
+in regulated and large-scale enterprise environments.
 
-Overview
+The architecture emphasizes **security-by-design, governance, and scalability**, aligning with
+banking and enterprise data platform standards.
 
-This repository demonstrates a secure, cloud-native Lakehouse reference architecture using Azure Databricks and Delta Lake. It showcases end-to-end data ingestion, transformation, and SQL-based analytics following the medallion architecture (Bronze, Silver, Gold), with emphasis on scalability, governance, and security-by-design for enterprise analytics and AI workloads.
+---
 
-This repository is intended as a customer-facing reference implementation to support architecture discussions, technical workshops, and solution design conversations.
+## Architecture Highlights
 
-⸻
+- Secure data ingestion from multiple sources
+- Medallion architecture (Bronze, Silver, Gold)
+- Role-based access control and data governance
+- Separation of compute, storage, and security boundaries
+- AI-ready analytics foundation
 
-Architecture Overview
+---
 
-The solution follows a standard Lakehouse architecture pattern:
+## Key Components
 
-Data Sources → Ingestion → Lakehouse Storage → Processing → Analytics & ML Consumers
+### Data Ingestion
+- Batch and streaming ingestion patterns
+- Secure landing zones
+- Schema validation and enforcement
 
-Key design principles:
-	•	Separation of raw, refined, and curated data
-	•	Scalable and cloud-native processing
-	•	Analytics- and AI-ready data structures
-	•	Security and governance applied across the data lifecycle
+### Data Transformation
+- Delta Lake ACID transactions
+- Incremental transformations
+- Optimized query performance
 
-An architecture diagram is provided in the /architecture folder.
+### Governance & Access Control
+- Workspace-level and data-level security
+- Role-based access control (RBAC)
+- Least-privilege access patterns
 
-⸻
+### Security Controls
+- Secure network boundaries
+- Identity-driven access
+- Encryption at rest and in transit
+- Auditing and monitoring considerations
 
-Medallion Architecture
+---
 
-The Lakehouse is organized into three logical layers:
-	•	Bronze Layer
-Raw ingested data stored in Delta format with minimal transformation.
-	•	Silver Layer
-Cleaned, validated, and enriched data suitable for analytics and feature preparation.
-	•	Gold Layer
-Aggregated, analytics-ready datasets optimized for SQL queries, dashboards, and reporting.
+## Technology Stack
 
-This pattern improves data quality, traceability, and scalability.
+- Azure Databricks
+- Delta Lake
+- Azure Data Lake Storage
+- SQL
+- Python
 
-⸻
+---
 
-Repository Structure
-databricks-lakehouse-architecture/
-│
-├── README.md
-├── architecture/
-│   └── lakehouse-architecture.png
-│
-├── notebooks/
-│   ├── 01_data_ingestion.py
-│   ├── 02_transformation_silver.py
-│   ├── 03_analytics_gold.sql
-│   └── 04_ml_readiness.py
-│
-├── data/
-│   └── sample_data.csv
-│
-└── docs/
-    └── walkthrough.md
+## Enterprise Use Cases
 
+- Banking and financial analytics
+- Enterprise reporting and BI
+- AI and machine learning workloads
+- Compliance-aware data platforms
 
-⸻
+---
 
-Notebooks Overview
-	•	01_data_ingestion.py
-Demonstrates batch ingestion of sample data into Delta Bronze tables.
-	•	02_transformation_silver.py
-Applies data cleansing, enrichment, and transformation using Spark DataFrames.
-	•	03_analytics_gold.sql
-Creates aggregated datasets and SQL views to support analytics and KPI reporting.
-	•	04_ml_readiness.py
-Prepares curated datasets for downstream machine learning experimentation and feature use.
+## Audience
 
-The notebooks are intentionally lightweight and designed for architecture demonstration, not production deployment.
+This project is intended for:
+- Solutions Architects
+- Cloud & Data Architects
+- Enterprise Data Platform Teams
+- Technical leaders designing secure analytics platforms
 
-⸻
+---
 
-Analytics & Use Cases
+## Author
 
-This reference architecture supports common enterprise scenarios such as:
-	•	Business performance and operational reporting
-	•	Usage and trend analytics
-	•	Executive dashboards powered by SQL analytics
-	•	ML and AI experimentation on curated datasets
-
-⸻
-
-Security & Governance Considerations
-
-The architecture is designed with security-by-design, including:
-	•	Controlled access to data layers
-	•	Environment isolation
-	•	Governance-ready data organization
-	•	Compatibility with enterprise identity and access models
-
-Security and governance concepts are applied across ingestion, storage, processing, and consumption layers.
-
-⸻
-
-Intended Audience
-	•	Solutions Architects
-	•	Sales Engineers / Field Engineering
-	•	Cloud & Data Architects
-	•	Customers exploring Lakehouse architectures
+**Goddy Otuwho**  
+Senior Cloud & Security Architect  
+LinkedIn: https://www.linkedin.com/in/goddyotuwho
 
 ⸻
 
