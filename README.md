@@ -10,6 +10,33 @@ banking and enterprise data platform standards.
 
 ---
 
+flowchart LR
+    A[Enterprise Data Sources<br/>• Operational Databases<br/>• SaaS Applications<br/>• Logs & Events] --> B[Secure Data Ingestion Layer<br/>• Batch & Streaming<br/>• Schema Validation<br/>• Data Quality Checks]
+
+    B --> C[Bronze Layer<br/>Raw Data Storage<br/>• Immutable<br/>• Encrypted at Rest<br/>• Audit-Ready]
+
+    subgraph Secure_Analytics_Boundary [Secure Analytics Boundary]
+        C --> D[Silver Layer<br/>Cleansed & Validated Data<br/>• Deduplication<br/>• Standardization]
+
+        D --> E[Gold Layer<br/>Curated & Analytics-Ready Data<br/>• Business Aggregations<br/>• Optimized Schemas]
+
+        subgraph Databricks [Azure Databricks Workspace]
+            D
+            E
+        end
+    end
+
+    E --> F[Analytics & Consumption Layer<br/>• SQL Analytics<br/>• BI & Reporting<br/>• Data Science & ML]
+
+    E --> G[AI & Advanced Analytics Workloads<br/>• Feature Engineering<br/>• Model Training]
+
+    H[Data Governance & Access Control<br/>• RBAC<br/>• Least Privilege<br/>• Auditing] -.-> D
+    H -.-> E
+
+    I[Monitoring & Observability<br/>• Logging<br/>• Telemetry<br/>• Compliance Visibility] -.-> Databricks
+
+    ---
+
 ## Architecture Highlights
 
 - Secure data ingestion from multiple sources
