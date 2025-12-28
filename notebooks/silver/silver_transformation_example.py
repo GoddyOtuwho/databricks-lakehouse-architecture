@@ -1,44 +1,57 @@
 """
-silver_transformation_example.py
-Illustrative example: Bronze -> Silver transformation in a Databricks Lakehouse.
-
+Silver Transformation Example (Bronze -> Silver)
+------------------------------------------------
 Purpose:
 - Cleanse and validate ingested data (Bronze)
-- Deduplicate and standardize schema (Silver)
-- Write Silver Delta tables for governed analytics and downstream consumption
+- Deduplicate and standardize schema
+- Write curated Silver Delta tables for governed analytics and downstream consumption
 
 Notes:
-- This is a reference implementation snippet (intentionally minimal).
-- Replace paths/catalog/schema with your environment conventions (Unity Catalog recommended).
+- This is a minimal reference implementation
+- Replace catalog/schema/table names with your environment (Unity Catalog recommended)
 """
 
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 
 # -----------------------------
-# Inputs (Bronze)
+# 1) Parameters
 # -----------------------------
-bronze_path = "/mnt/bronze/customer_events"  # example path
-df_bronze = spark.read.format("delta").load(bronze_path)
+BRONZE_PATH = "/mnt/bronze/customer_events"
+SILVER_PATH = "/mnt/silver/customer_events"
+SILVER_TABLE_NAME = "silver.customer_events"  # optional UC table name
 
 # -----------------------------
-# Standardization & Validation
+# 2) Read Bronze Delta
+# -----------------------------
+df_bronze = spark.read.format("delta").load(BRONZE_PATH)
+
+# -----------------------------
+# 3) Standardization & Validation
 # -----------------------------
 df_clean = (
     df_bronze
-    .withColumn("event_time", F.to_timestamp("event_time"))
     .withColumn("customer_id", F.col("customer_id").cast("string"))
+    .withColumn("event_id", F.col("event_id").cast("string"))
+    .withColumn("event_time", F.to_timestamp(F.col("event_time")))
     .withColumn("event_type", F.upper(F.trim(F.col("event_type"))))
-    .withColumn("ingest_date", F.to_date(F.col("ingest_time")))
+    .withColumn("source_system", F.upper(F.trim(F.col("source_system"))))
+    .withColumn("amount", F.col("amount").cast("double"))
+)
+
+# Keep only valid records (example rules)
+df_clean = (
+    df_clean
     .filter(F.col("customer_id").isNotNull())
     .filter(F.col("event_time").isNotNull())
 )
 
 # -----------------------------
-# Deduplication (example rule)
-# Keep latest record per (customer_id, event_time, event_type)
+# 4) Deduplication
 # -----------------------------
-w = Window.partitionBy("customer_id", "event_time", "event_type").orderBy(F.col("ingest_time").desc())
+# Keep latest record per (event_id) based on ingest_time (or event_time)
+w = Window.partitionBy("event_id").orderBy(F.col("ingest_time").desc_nulls_last())
+
 df_silver = (
     df_clean
     .withColumn("rn", F.row_number().over(w))
@@ -47,18 +60,18 @@ df_silver = (
 )
 
 # -----------------------------
-# Output (Silver)
+# 5) Write Silver Delta
 # -----------------------------
-silver_path = "/mnt/silver/customer_events"  # example path
 (
-    df_silver
-    .write
+    df_silver.write
     .format("delta")
     .mode("overwrite")
     .option("overwriteSchema", "true")
-    .save(silver_path)
+    .save(SILVER_PATH)
 )
 
-# Optional: register as table (Unity Catalog style)
-# spark.sql("CREATE SCHEMA IF NOT EXISTS main.silver")
-# spark.sql(f"CREATE TABLE IF NOT EXISTS main.silver.customer_events USING DELTA LOCATION '{silver_path}'")
+# Optional: Register table in catalog
+# spark.sql(f"CREATE TABLE IF NOT EXISTS {SILVER_TABLE_NAME} USING DELTA LOCATION '{SILVER_PATH}'")
+
+print("✅ Silver transformation complete.")
+print(f"Silver path: {SILVER_PATH}")
