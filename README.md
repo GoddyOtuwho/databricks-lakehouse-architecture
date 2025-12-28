@@ -10,7 +10,73 @@ banking and enterprise data platform standards.
 
 ---
 ## Architecture Diagram
-<!-- Diagram will be added here -->
+
+```mermaid
+flowchart LR
+    A["Enterprise Data Sources
+    - Operational Databases
+    - SaaS Applications
+    - Logs and Events"]
+
+    B["Secure Data Ingestion Layer
+    - Batch and Streaming
+    - Schema Validation
+    - Data Quality Checks"]
+
+    C["Bronze Layer
+    Raw Data Storage
+    - Immutable
+    - Encrypted at Rest
+    - Audit Ready"]
+
+    D["Silver Layer
+    Cleansed and Validated Data
+    - Deduplication
+    - Standardization"]
+
+    E["Gold Layer
+    Curated Analytics Ready Data
+    - Business Aggregations
+    - Optimized Schemas"]
+
+    F["Analytics and Consumption Layer
+    - SQL Analytics
+    - BI Reporting
+    - Data Science and ML"]
+
+    G["AI and Advanced Analytics Workloads
+    - Feature Engineering
+    - Model Training"]
+
+    H["Data Governance and Access Control
+    - RBAC
+    - Least Privilege
+    - Auditing"]
+
+    I["Monitoring and Observability
+    - Logging
+    - Telemetry
+    - Compliance Visibility"]
+
+    A --> B
+    B --> C
+
+    subgraph SAB["Secure Analytics Boundary"]
+        C --> D
+        D --> E
+
+        subgraph DBX["Azure Databricks Workspace"]
+            D
+            E
+        end
+    end
+
+    E --> F
+    E --> G
+
+    H -.-> D
+    H -.-> E
+    I -.-> DBX
     ---
 ```markdown
 ---
