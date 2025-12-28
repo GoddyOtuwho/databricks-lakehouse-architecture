@@ -1,78 +1,73 @@
 """
-Bronze Data Ingestion Example (Databricks Lakehouse)
----------------------------------------------------
+bronze_ingestion_example.py
+Illustrative example: JSON ingestion -> Bronze Delta (raw, immutable-style)
+
 Purpose:
-- Ingest raw enterprise data into the Bronze layer
-- Apply schema enforcement and basic data quality checks
-- Persist immutable raw data in Delta Lake (append-only pattern)
+- Read raw events (JSON/NDJSON)
+- Basic schema + ingestion metadata
+- Write to Bronze Delta path (and optionally register a table)
 
 Notes:
-- This is an illustrative reference implementation
-- Shows batch ingestion (can be extended to Auto Loader / streaming)
-- Replace paths/catalog/schema with your environment conventions
+- This is intentionally minimal (reference design).
+- Replace paths/catalog/schema to match your environment (Unity Catalog, storage accounts, etc.).
 """
 
 from pyspark.sql import functions as F
-from pyspark.sql.types import StructType, StructField, StringType, TimestampType, DoubleType
+from pyspark.sql.types import (
+    StructType, StructField, StringType, DoubleType
+)
 
 # -----------------------------
-# 1) Parameters (environment)
+# 1) Parameters (edit these)
 # -----------------------------
-RAW_INPUT_PATH = "/mnt/raw/customer_events/"            # e.g., ADLS Gen2 landing zone
-BRONZE_TABLE_PATH = "/mnt/bronze/customer_events"       # e.g., ADLS Gen2 bronze zone
-BRONZE_TABLE_NAME = "bronze.customer_events"            # optional: Unity Catalog table name
+# In Databricks, you will typically copy the repo file into DBFS/Volume first.
+# Example DBFS path: /dbfs/FileStore/... or /Volumes/<catalog>/<schema>/...
+RAW_INPUT_PATH = "/dbfs/FileStore/lakehouse_demo/customer_events.ndjson"
+
+BRONZE_PATH = "/mnt/bronze/customer_events"
+BRONZE_TABLE = "bronze.customer_events"  # optional UC/Hive table name
 
 # -----------------------------
-# 2) Schema Enforcement
+# 2) Schema (keep stable in Bronze)
 # -----------------------------
-event_schema = StructType([
+schema = StructType([
     StructField("event_id", StringType(), True),
     StructField("customer_id", StringType(), True),
     StructField("event_type", StringType(), True),
-    StructField("event_time", TimestampType(), True),
+    StructField("event_time", StringType(), True),  # parse later
     StructField("amount", DoubleType(), True),
-    StructField("source_system", StringType(), True)
+    StructField("source_system", StringType(), True),
 ])
 
 # -----------------------------
-# 3) Read Raw Data (Batch)
+# 3) Read raw (NDJSON recommended)
 # -----------------------------
-# Example assumes JSON. Replace with csv/parquet as needed.
 df_raw = (
     spark.read
-    .schema(event_schema)
-    .json(RAW_INPUT_PATH)
+    .schema(schema)
+    .json(RAW_INPUT_PATH)   # NDJSON: one JSON object per line
 )
 
-# -----------------------------
-# 4) Basic Data Quality Checks
-# -----------------------------
-# Keep raw data mostly intact in Bronze, but filter out unusable records
 df_bronze = (
     df_raw
+    .withColumn("event_time", F.to_timestamp("event_time"))
     .withColumn("ingest_time", F.current_timestamp())
-    .withColumn("ingest_date", F.to_date(F.col("ingest_time")))
-    .filter(F.col("event_id").isNotNull())
-    .filter(F.col("event_time").isNotNull())
+    .withColumn("ingest_date", F.to_date("ingest_time"))
 )
 
-# Optional: lightweight normalization (still "raw-ish")
-df_bronze = df_bronze.withColumn("event_type", F.upper(F.trim(F.col("event_type"))))
-
 # -----------------------------
-# 5) Write Bronze Delta (Append)
+# 4) Write Bronze Delta (append)
 # -----------------------------
-# Bronze is typically append-only and immutable (no updates)
 (
     df_bronze.write
     .format("delta")
     .mode("append")
     .partitionBy("ingest_date")
-    .save(BRONZE_TABLE_PATH)
+    .save(BRONZE_PATH)
 )
 
-# Optional: Register table in catalog (if desired)
-# spark.sql(f"CREATE TABLE IF NOT EXISTS {BRONZE_TABLE_NAME} USING DELTA LOCATION '{BRONZE_TABLE_PATH}'")
+# Optional: register table (Unity Catalog or Hive Metastore)
+# spark.sql(f"CREATE TABLE IF NOT EXISTS {BRONZE_TABLE} USING DELTA LOCATION '{BRONZE_PATH}'")
 
 print("✅ Bronze ingestion complete.")
-print(f"Bronze path: {BRONZE_TABLE_PATH}")
+print(f"Bronze path: {BRONZE_PATH}")
