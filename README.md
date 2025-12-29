@@ -104,6 +104,12 @@ Azure Well-Architected Framework and Databricks Lakehouse best practices.
 - Unity Catalog assumed as the centralized governance plane for metadata, access control, and lineage.
 - Compute and storage intentionally decoupled to support scalable, cost-efficient analytics.
 - Notebooks are intentionally minimal and illustrative to emphasize architectural intent over production hardening.
+### Production Extensions (Out of Scope)
+In a production implementation, this architecture would typically be extended with:
+- CI/CD pipelines for notebook and schema promotion
+- Data quality frameworks (e.g., expectations, anomaly detection)
+- Fine-grained Unity Catalog permissions
+- Cost governance and workload isolation strategies
 ## Execution Flow
 
 1. **Bronze Ingestion**
