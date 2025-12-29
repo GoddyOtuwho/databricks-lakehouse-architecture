@@ -76,6 +76,26 @@ I -.-> E
 - AI-ready analytics foundation
 ---
 
+## Architecture Overview
+
+![Azure Databricks Lakehouse Architecture](assets/lakehouse-architecture.png)
+
+**Figure 1: Azure Databricks Enterprise Lakehouse Reference Architecture**
+
+This architecture illustrates a secure, governed, and scalable Lakehouse implementation
+on Azure Databricks using the Medallion pattern (Bronze, Silver, Gold).
+
+Enterprise data sources are ingested through a secure ingestion layer supporting batch
+and streaming workloads. Raw data is stored immutably in the Bronze layer using Delta Lake,
+cleansed and standardized in the Silver layer, and curated into analytics- and ML-ready
+datasets in the Gold layer.
+
+Centralized governance, access control, and auditing are enforced through role-based access
+control (RBAC) and least-privilege policies, while observability and monitoring provide
+end-to-end operational and compliance visibility.
+
+This design separates compute and storage, supports AI-ready analytics, and aligns with
+Azure Well-Architected Framework and Databricks Lakehouse best practices.
 ## Design Decisions
 
 - Medallion architecture (Bronze, Silver, Gold) chosen to isolate raw, cleansed, and curated data concerns.
